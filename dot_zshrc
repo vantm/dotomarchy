@@ -82,5 +82,5 @@ alias v=nvim
 alias vi=nvim
 alias lg=lazygit
 
-export PATH="$PATH:~/bin"
+export PATH="$PATH:$HOME/bin"
 
