@@ -15,7 +15,7 @@ config.enable_wayland = true
 config.front_end = "WebGpu"
 
 config.keys = {
-	{ key = "n", mods = "CTRL|SHIFT", action = act.ActivateTabRelative(1) },
-	{ key = "p", mods = "CTRL|SHIFT", action = act.ActivateTabRelative(-1) },
+	{ key = "j", mods = "CTRL|SHIFT", action = act.ActivateTabRelative(1) },
+	{ key = "k", mods = "CTRL|SHIFT", action = act.ActivateTabRelative(-1) },
 }
 return config

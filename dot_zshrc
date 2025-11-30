@@ -81,6 +81,7 @@ alias k=kubectl
 alias v=nvim
 alias vi=nvim
 alias lg=lazygit
+alias ag=antigravity
 
 export PATH="$PATH:$HOME/bin"
 
