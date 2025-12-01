@@ -1,5 +1,24 @@
 #!/usr/bin/env /bin/bash
 
+function get_floating_without_tiled_relatives {
+    WSID="${1}"
+
+    CLIENTS_JSON="$(hyprctl clients -j)"
+    CLIENTS=()
+
+    while IFS= read -r CLIENT ; do
+        PID="$(echo $CLIENT | jq -r ".pid")"
+        ADDRESS="$(echo $CLIENT | jq -r ".address")"
+        RELATIVES="$(echo $CLIENTS_JSON | jq -cr "map(select(.address != \"$ADDRESS\" and .pid == $PID)) | .[]" 2>/dev/null)"
+
+        if [[ -z "$RELATIVES" ]] ; then
+            echo "$ADDRESS"
+        fi
+    done <<< "$(echo $CLIENTS_JSON | jq -cr "map(select(.workspace.id == $WSID and .floating == true)) | .[]" 2>/dev/null)"
+}
+
+
+
 function handle {
   if [[ ${1:0:14} == "activewindowv2" ]]; then
     JSON="$(hyprctl activewindow -j)"
@@ -7,11 +26,13 @@ function handle {
 
     if [[ "$FLOATING" == "false" ]] ; then
         WSID="$(echo $JSON | jq -r ".workspace.id")"
-        hyprctl clients -j | \
-        jq -r "map(select(.workspace.id == $WSID and .floating == true)) | .[].address" | \
-        xargs -I{} hyprctl dispatch movetoworkspacesilent special:minimized$WSID,address:{} 2>/dev/null
 
-        hyprctl dispatch focuswindow "address:${1:20:12}"
+        while IFS= read -r CLIENT ; do
+            echo "Moving $CLIENT..."
+            hyprctl -q dispatch movetoworkspacesilent "special:minimized$WSID,address:$CLIENT"
+        done <<< "$(get_floating_without_tiled_relatives "$WSID")"
+
+        hyprctl -q dispatch focuswindow "address:${1:20:12}"
     fi
   fi
 }
