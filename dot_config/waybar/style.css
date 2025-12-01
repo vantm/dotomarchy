@@ -35,8 +35,7 @@
 #pulseaudio,
 #custom-omarchy,
 #custom-screenrecording-indicator,
-#custom-update,
-#custom-minimized {
+#custom-update {
   min-width: 12px;
   margin: 0 7.5px;
 }
@@ -54,7 +53,9 @@
 }
 
 #custom-minimized {
-  font-size: 14px;
+  font-size: 13px;
+  min-width: 12px;
+  margin-left: 10px;
 }
 
 #custom-expand-icon {

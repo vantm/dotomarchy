@@ -1,0 +1,19 @@
+#!/bin/env /bin/bash
+
+function count_minimized_windows {
+  hyprctl clients -j | \
+    jq -cr ".[] | select(.workspace.name == \"special:minimized$(hyprctl activeworkspace -j | \
+    jq -r '.id')\")" | \
+    jq -s "length"
+}
+
+SOCKET2_PATH="$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock"
+EVENTS="^(workspace|activewindow|movewindow)>>"
+
+echo "$(count_minimized_windows)"
+
+nc -U "$SOCKET2_PATH" | while read -r EVENT; do
+  if echo $EVENT | grep -E $EVENTS &>/dev/null; then
+    echo "$(count_minimized_windows)"
+  fi
+done
