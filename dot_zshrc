@@ -82,6 +82,7 @@ alias v=nvim
 alias vi=nvim
 alias lg=lazygit
 alias ag=antigravity
+alias chez="chezmoi list -p absolute -i files | fzf | xargs chezmoi edit --apply"
 
 export PATH="$PATH:$HOME/bin"
 
