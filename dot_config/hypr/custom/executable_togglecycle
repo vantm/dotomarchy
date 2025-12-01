@@ -6,12 +6,11 @@ if [ "$FLOATING_STATUS" = "true" ]; then
     hyprctl dispatch cyclenext next tiled
 else
     WORKSPACE_ID="$(hyprctl activeworkspace -j | jq -r '.id')"
+    CLIENTS_JSON="$(hyprctl clients -j)"
 
-    hyprctl clients -j | \
+    echo $CLIENTS_JSON | \
     jq -r "map(select(.workspace.name == \"special:minimized$WORKSPACE_ID\")) | .[].address" | \
     xargs -I{} hyprctl dispatch movetoworkspacesilent $WORKSPACE_ID,address:{}
 
-    hyprctl clients -j | \
-    jq -r "map(select(.workspace.id == $WORKSPACE_ID and .floating == true)) | last | .address" | \
-    xargs -I{} hyprctl dispatch focuswindow address:{}
+    hyprctl dispatch cyclenext next floating
 fi
