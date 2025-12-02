@@ -24,6 +24,7 @@ function handle {
         done <<< "$(hyprctl clients -j | jq -cr ".[] | select(.workspace.name == \"special:minimized$WSID\")" | jq -r '.address')"
 
         hyprctl -q dispatch cyclenext next floating
+        hyprctl -q dispatch alterzorder "top,address$(hyprctl activewindow -j | jq -r ".address")"
     fi
   fi
 }
