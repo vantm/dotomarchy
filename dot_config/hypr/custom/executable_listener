@@ -17,8 +17,6 @@ function get_floating_without_tiled_relatives {
     done <<< "$(echo $CLIENTS_JSON | jq -cr "map(select(.workspace.id == $WSID and .floating == true)) | .[]" 2>/dev/null)"
 }
 
-
-
 function handle {
   if [[ ${1:0:14} == "activewindowv2" ]]; then
     JSON="$(hyprctl activewindow -j)"
@@ -28,11 +26,18 @@ function handle {
         WSID="$(echo $JSON | jq -r ".workspace.id")"
 
         while IFS= read -r CLIENT ; do
-            echo "Moving $CLIENT..."
             hyprctl -q dispatch movetoworkspacesilent "special:minimized$WSID,address:$CLIENT"
         done <<< "$(get_floating_without_tiled_relatives "$WSID")"
 
         hyprctl -q dispatch focuswindow "address:${1:20:12}"
+    elif [[ "$JSON" == "{}" ]] ; then
+        WSID="$(hyprctl activeworkspace -j | jq -r '.id')"
+
+        while IFS= read -r CLIENT ; do
+            hyprctl -q dispatch movetoworkspacesilent "$WSID,address:$CLIENT"
+        done <<< "$(hyprctl clients -j | jq -cr ".[] | select(.workspace.name == \"special:minimized$WSID\")" | jq -r '.address')"
+
+        hyprctl -q dispatch cyclenext next floating
     fi
   fi
 }
