@@ -7,10 +7,10 @@ else
   w="0"
   h="0"
   case $d in
-    l) w="-10%" ;;
-    r) w="10%" ;;
-    u) h="-8%" ;;
-    d) h="8%" ;;
+    l) w="-100" ;;
+    r) w="100" ;;
+    u) h="-50" ;;
+    d) h="100" ;;
   esac
   hyprctl dispatch -q moveactive "$w" "$h"
 fi
