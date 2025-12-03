@@ -1,5 +1,25 @@
 #!/usr/bin/env /bin/bash
 
+function minimized {
+    WSID="${1}"
+
+    hyprctl clients -j | \
+    jq -r "map(select(.workspace.id == $WSID and .floating == true))" | \
+    jq "\"dispatch movetoworkspacesilent special:minimized$WSID,address:\" + (.[] | .address)" | \
+    jq -sr 'join("; ")' | \
+    xargs hyprctl -q --batch
+}
+
+function unminimized {
+    WSID="$(hyprctl activeworkspace -j | jq -r '.id')"
+
+    hyprctl clients -j | \
+    jq -r "map(select(.workspace.name == \"special:minimized$WSID\"))" | \
+    jq "\"dispatch movetoworkspacesilent $WSID,address:\" + (.[] | .address)" | \
+    jq -sr 'join("; ")' | \
+    xargs hyprctl -q --batch
+}
+
 function handle {
   if [[ ${1:0:14} == "activewindowv2" ]]; then
     JSON="$(hyprctl activewindow -j)"
@@ -7,24 +27,24 @@ function handle {
 
     if [[ "$FLOATING" == "false" ]] ; then
         WSID="$(echo $JSON | jq -r '.workspace.id')"
+        minimized "$WSID"
+    else
+        unminimized
 
-        while IFS= read -r CLIENT_JSON ; do
-            if [[ "$(echo $CLIENT_JSON | jq -r '.tags | contains(["modal*"])')" == "false" ]] ; then
-                CLIENT="$(echo $CLIENT_JSON | jq -r ".address")"
-                hyprctl -q dispatch movetoworkspacesilent "special:minimized$WSID,address:$CLIENT"
+        FILE="/tmp/hyprlistener-$HYPRLAND_INSTANCE_SIGNATURE-$WSID.tmp"
+        ADDR="$(head -1q $FILE 2>/dev/null)"
+        rm -f $FILE
+
+        if [[ $ADDR == 0x* ]] ; then
+            hyprctl -q dispatch focuswindow "address:$ADDR"
+            hyprctl -q dispatch alterzorder "top,address:$ADDR"
+        else
+            if [[ "$JSON" == "{}" || \
+                "$(hyprctl activewindow -j | jq -r '.floating')" == "false" ]] ; then
+                hyprctl -q dispatch cyclenext prev floating hist
             fi
-        done <<< "$(hyprctl clients -j | jq -cr "map(select(.workspace.id == $WSID and .floating == true)) | .[]" 2>/dev/null)"
-
-        hyprctl -q dispatch focuswindow "address:${1:20:12}"
-    elif [[ "$JSON" == "{}" ]] ; then
-        WSID="$(hyprctl activeworkspace -j | jq -r '.id')"
-
-        while IFS= read -r CLIENT ; do
-            hyprctl -q dispatch movetoworkspacesilent "$WSID,address:$CLIENT"
-        done <<< "$(hyprctl clients -j | jq -cr ".[] | select(.workspace.name == \"special:minimized$WSID\")" | jq -r '.address')"
-
-        hyprctl -q dispatch cyclenext next floating
-        hyprctl -q dispatch alterzorder "top,address$(hyprctl activewindow -j | jq -r ".address")"
+            hyprctl -q dispatch alterzorder "top,address:$(hyprctl activewindow -j | jq -r ".address")"
+        fi
     fi
   fi
 }

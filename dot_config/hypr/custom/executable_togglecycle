@@ -3,6 +3,9 @@ ACTIVE_WINDOW_JSON="$(hyprctl activewindow -j)"
 FLOATING_STATUS="$(echo "$ACTIVE_WINDOW_JSON" | jq -r '.floating')"
 
 if [ "$FLOATING_STATUS" = "true" ]; then
+    ADDR="$(echo $ACTIVE_WINDOW_JSON | jq -r '.address')"
+    WSID="$(echo $ACTIVE_WINDOW_JSON | jq -r '.workspace.id')"
+    echo "$ADDR" > "/tmp/hyprlistener-$HYPRLAND_INSTANCE_SIGNATURE-$WSID.tmp"
     hyprctl dispatch cyclenext next tiled
 else
     WORKSPACE_ID="$(hyprctl activeworkspace -j | jq -r '.id')"
