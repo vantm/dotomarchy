@@ -10,7 +10,7 @@ background = '#1b1b1b'
 normal = { family = "0xProto Nerd Font", style = "Regular" }
 bold = { family = "0xProto Nerd Font", style = "Bold" }
 italic = { family = "0xProto Nerd Font", style = "Italic" }
-size = 10
+size = 11
 
 [window]
 padding.x = 8
