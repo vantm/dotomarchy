@@ -4,24 +4,23 @@ function minimized {
   WSID="${1}"
 
   hyprctl clients -j | \
-  jq -r "map(select(.workspace.id == $WSID and .floating == true))" | \
-  jq "\"dispatch movetoworkspacesilent special:minimized$WSID,address:\" + (.[] | .address)" | \
-  jq -sr 'join("; ")' | \
-  xargs hyprctl -q --batch
+    jq -r "map(select(.workspace.id == $WSID and .floating == true and (.tags | contains([\"modal*\"]) | not)))" | \
+    jq "\"dispatch movetoworkspacesilent special:minimized$WSID,address:\" + (.[] | .address)" | \
+    jq -sr 'join("; ")' | \
+    xargs hyprctl -q --batch
 }
 
 function unminimized {
   WSID="$(hyprctl activeworkspace -j | jq -r '.id')"
 
   hyprctl clients -j | \
-  jq -r "map(select(.workspace.name == \"special:minimized$WSID\"))" | \
-  jq "\"dispatch movetoworkspacesilent $WSID,address:\" + (.[] | .address)" | \
-  jq -sr 'join("; ")' | \
-  xargs hyprctl -q --batch
+    jq -r "map(select(.workspace.name == \"special:minimized$WSID\"))" | \
+    jq "\"dispatch movetoworkspacesilent $WSID,address:\" + (.[] | .address)" | \
+    jq -sr 'join("; ")' | \
+    xargs hyprctl -q --batch
 }
 
 function handle {
-  echo "event: ${1}"
   if [[ ${1:0:14} == "activewindowv2" ]]; then
     JSON="$(hyprctl activewindow -j)"
     FLOATING="$(echo $JSON | jq -r '.floating')"
@@ -36,8 +35,9 @@ function handle {
       rm -f $FILE
 
       if [[ $ADDR == 0x* ]] ; then
-          hyprctl -q dispatch focuswindow "address:$ADDR"
-          hyprctl -q dispatch alterzorder "top,address:$ADDR"
+          hyprctl -q --batch "\
+            dispatch focuswindow address:$ADDR ; \
+            dispatch alterzorder top,address:$ADDR"
       else
           if [[ "$JSON" == "{}" || \
               "$(hyprctl activewindow -j | jq -r '.floating')" == "false" ]] ; then
