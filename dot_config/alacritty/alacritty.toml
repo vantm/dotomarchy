@@ -22,3 +22,6 @@ bindings = [
 { key = "Insert", mods = "Shift", action = "Paste" },
 { key = "Insert", mods = "Control", action = "Copy" }
 ]
+
+[cursor]
+vi_mode_style = { shape = "Block", blinking = "On" }
