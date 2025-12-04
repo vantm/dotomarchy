@@ -4,6 +4,3 @@ WORKSPACE_ID="$(hyprctl activeworkspace -j | jq -r '.id')"
 hyprctl clients -j | \
 jq -r "map(select(.workspace.name == \"special:minimized$WORKSPACE_ID\")) | .[].address" | \
 xargs -I{} hyprctl dispatch movetoworkspacesilent $WORKSPACE_ID,address:{}
-
-hyprctl dispatch cyclenext next floating
-
