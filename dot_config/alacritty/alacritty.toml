@@ -20,7 +20,8 @@ decorations = "None"
 [keyboard]
 bindings = [
 { key = "Insert", mods = "Shift", action = "Paste" },
-{ key = "Insert", mods = "Control", action = "Copy" }
+{ key = "Insert", mods = "Control", action = "Copy" },
+{ key = "O", mods = "Shift", mode = "Vi", action = "Open"},
 ]
 
 [cursor]
