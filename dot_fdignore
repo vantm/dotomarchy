@@ -1,0 +1,15 @@
+.cargo
+go/pkg/
+.nuget
+.dotnet
+.cache
+.npm
+.nv
+.steam
+.swt
+.sonarlint
+.next
+.turbo
+dist
+out
+node_module
