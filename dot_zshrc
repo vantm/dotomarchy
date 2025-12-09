@@ -14,7 +14,7 @@ if command -v zoxide &> /dev/null; then
 fi
 
 if command -v fzf &> /dev/null; then
-  export FZF_CTRL_T_COMMAND='fd'
+  export FZF_CTRL_T_COMMAND='fd -H'
   export FZF_ALT_C_COMMAND='fd --type dir'
 
   if [[ -f /usr/share/fzf/completion.zsh ]]; then
@@ -80,6 +80,7 @@ alias ll="ls -la"
 alias la="ls -1a"
 alias rm="rm -i"
 alias mv="mv -i"
+alias cls="clear"
 alias k=kubectl
 alias v=nvim
 alias vi=nvim

@@ -13,3 +13,6 @@ go/pkg/
 dist
 out
 node_module
+.klei
+.eclipse
+.ollama
