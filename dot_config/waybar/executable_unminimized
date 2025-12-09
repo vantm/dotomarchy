@@ -1,6 +1,14 @@
 #!/usr/bin/env /bin/bash
-WORKSPACE_ID="$(hyprctl activeworkspace -j | jq -r '.id')"
+WSID="$(hyprctl activeworkspace -j | jq -r '.id')"
 
 hyprctl clients -j | \
-jq -r "map(select(.workspace.name == \"special:minimized$WORKSPACE_ID\")) | .[].address" | \
-xargs -I{} hyprctl dispatch movetoworkspacesilent $WORKSPACE_ID,address:{}
+  jq -r "map(select(.workspace.name == \"special:minimized$WSID\"))" | \
+  jq "\"dispatch movetoworkspacesilent $WSID,address:\" + (.[] | .address)" | \
+  jq -sr 'join("; ")' | \
+  xargs hyprctl -q --batch
+
+AWID="$(hyprctl activewindow -j | jq -r ".address")"
+
+hyprctl -q --batch \
+  "dispatch cyclenext prev floating hist;\
+   dispatch alterzorder top,address:$AWID"
